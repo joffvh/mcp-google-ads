@@ -2,6 +2,25 @@
 
 # Google Ads MCP
 
+> ### ℹ️ This is a fork — why it exists
+>
+> Forked from [cohnen/mcp-google-ads](https://github.com/cohnen/mcp-google-ads) on **2026-08-12**
+> to carry two patches that the read-only Google Ads analysis workspace it is vendored into
+> depends on. It is **not** a maintained alternative to upstream and takes no issues or PRs.
+>
+> | Change | Why |
+> |---|---|
+> | `API_VERSION` reads `GOOGLE_ADS_API_VERSION`, default **v22** (upstream hardcodes v19) | v19 is sunset and 404s. v21 sits in Google's deprecation blocking ramp — a fraction of requests fail `UNSUPPORTED_VERSION`, which reads as random flakiness. **v23+ drops `campaign.start_date` / `campaign.end_date`**, which existing queries use. v22 is the sweet spot. |
+> | `mcp>=1.3.0,<2` in `requirements.txt` (upstream: `mcp>=0.0.11`) | A fresh install otherwise resolves to mcp 2.x, which removed `mcp.server.fastmcp`. `google_ads_server.py` imports it at load and dies with `ModuleNotFoundError`. |
+>
+> **These were not sent upstream on purpose.** Upstream has had no commits since 2025-10-16 and
+> already carries **seven open PRs** fixing the same v19 problem (#17, #18, #19, #21, #22, #24, #25),
+> none merged. #25 independently lands on v22 and #19 independently takes the same
+> env-configurable approach used here — good corroboration, but no reason to file an eighth.
+>
+> To pull upstream in later: `git fetch upstream && git merge upstream/main`, expect a conflict
+> on the `API_VERSION` line, keep this side.
+
 ![Google Ads MCP](bg.jpeg)
 
 A tool that connects [Google Ads](https://ads.google.com/) with Claude AI, allowing you to analyze your advertising data through natural language conversations. This integration gives you access to campaign information, performance metrics, keyword analytics, and ad management—all through simple chat with Claude.
